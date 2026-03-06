@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SignCraft — Free Professional Email Signature Generator</title>
+  <meta name="description" content="Create a stunning professional email signature in 60 seconds. Free forever. Works with Gmail, Outlook, Apple Mail & more. No design skills needed." />
+  <meta name="keywords" content="email signature generator, professional email signature, free email signature, email signature maker, create email signature, business email signature" />
+  <meta property="og:title" content="SignCraft — Free Professional Email Signature Generator" />
+  <meta property="og:description" content="Create a stunning professional email signature in 60 seconds. Free forever." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://signcraft.com" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="SignCraft — Free Professional Email Signature Generator" />
+  <meta name="twitter:description" content="Create a stunning professional email signature in 60 seconds. Free forever." />
+  <link rel="canonical" href="https://signcraft.com" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><rect width='36' height='36' rx='8' fill='url(%23g)'/><defs><linearGradient id='g' x1='0' y1='0' x2='36' y2='36'><stop stop-color='%236366f1'/><stop offset='1' stop-color='%23c6941a'/></linearGradient></defs><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='20' font-weight='900' font-family='system-ui'>S</text></svg>" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #0a0e1a; color: #e2e8f0; -webkit-font-smoothing: antialiased; }
+    input:focus { border-color: #6366f1 !important; outline: none; }
+    button { font-family: inherit; }
+    button:hover { opacity: 0.92; }
+    ::selection { background: rgba(99,102,241,0.3); }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #2d3748; border-radius: 3px; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .anim-in { animation: fadeInUp 0.8s cubic-bezier(0.16,1,0.3,1) forwards; }
+    .anim-d1 { animation-delay: 0.1s; opacity: 0; }
+    .anim-d2 { animation-delay: 0.3s; opacity: 0; }
+    .anim-d3 { animation-delay: 0.5s; opacity: 0; }
+    .anim-d4 { animation-delay: 0.7s; opacity: 0; }
+    .anim-d5 { animation-delay: 0.9s; opacity: 0; }
+    @media (max-width: 768px) {
+      .editor-layout { flex-direction: column !important; }
+      .editor-sidebar { width: 100% !important; min-width: auto !important; max-height: 50vh; border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.06); }
+      .preview-panel { padding: 20px !important; }
+      .hero-title { font-size: 32px !important; }
+      .feature-grid { grid-template-columns: 1fr !important; }
+      .pricing-grid { grid-template-columns: 1fr !important; }
+      .preview-cards { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useRef, useCallback, useEffect } = React;
+
+    const TEMPLATES = [
+      { id: "modern", name: "Modern", desc: "Clean & minimal" },
+      { id: "bold", name: "Bold", desc: "Strong presence" },
+      { id: "elegant", name: "Elegant", desc: "Refined & classy" },
+      { id: "creative", name: "Creative", desc: "Stand out" },
+    ];
+
+    const COLORS = [
+      { id: "navy", primary: "#1a365d", accent: "#c6941a", label: "Navy & Gold" },
+      { id: "charcoal", primary: "#2d3748", accent: "#e53e3e", label: "Charcoal & Red" },
+      { id: "forest", primary: "#22543d", accent: "#d69e2e", label: "Forest & Amber" },
+      { id: "midnight", primary: "#1a202c", accent: "#6b46c1", label: "Midnight & Purple" },
+      { id: "ocean", primary: "#2b6cb0", accent: "#38b2ac", label: "Ocean & Teal" },
+      { id: "slate", primary: "#4a5568", accent: "#ed8936", label: "Slate & Orange" },
+    ];
+
+    const SOCIALS = [
+      { id: "linkedin", label: "LinkedIn", icon: "in", prefix: "https://linkedin.com/in/" },
+      { id: "twitter", label: "X / Twitter", icon: "\u{1D54F}", prefix: "https://x.com/" },
+      { id: "github", label: "GitHub", icon: "\u25C6", prefix: "https://github.com/" },
+      { id: "instagram", label: "Instagram", icon: "\u25CE", prefix: "https://instagram.com/" },
+      { id: "youtube", label: "YouTube", icon: "\u25B6", prefix: "https://youtube.com/@" },
+    ];
+
+    const FONTS = [
+      { id: "arial", label: "Arial", family: "Arial, Helvetica, sans-serif" },
+      { id: "georgia", label: "Georgia", family: "Georgia, 'Times New Roman', serif" },
+      { id: "verdana", label: "Verdana", family: "Verdana, Geneva, sans-serif" },
+      { id: "tahoma", label: "Tahoma", family: "Tahoma, Geneva, sans-serif" },
+      { id: "trebuchet", label: "Trebuchet", family: "'Trebuchet MS', Helvetica, sans-serif" },
+    ];
+
+    const DEFAULT_DATA = {
+      fullName: "Alex Morgan", jobTitle: "Senior Product Designer", company: "Acme Studios",
+      email: "alex@acmestudios.com", phone: "+1 (555) 123-4567", website: "www.acmestudios.com",
+      address: "", photoUrl: "", socials: {},
+    };
+
+    function genSigHTML(d, tmpl, csId, fontId, premium) {
+      const c = COLORS.find(s => s.id === csId) || COLORS[0];
+      const f = FONTS.find(fo => fo.id === fontId) || FONTS[0];
+
+      const socialHTML = Object.entries(d.socials || {}).filter(([, u]) => u && u.trim()).map(([pid, u]) => {
+        const p = SOCIALS.find(s => s.id === pid);
+        if (!p) return "";
+        const url = u.startsWith("http") ? u : p.prefix + u;
+        return '<a href="'+url+'" target="_blank" style="display:inline-block;width:24px;height:24px;line-height:24px;text-align:center;border-radius:50%;background-color:'+c.primary+';color:#ffffff;font-size:11px;font-weight:bold;text-decoration:none;margin-right:6px;font-family:'+f.family+';">'+p.icon+'</a>';
+      }).join("");
+
+      const photo = d.photoUrl
+        ? '<img src="'+d.photoUrl+'" width="80" height="80" style="border-radius:50%;object-fit:cover;display:block;" alt="'+d.fullName+'" />'
+        : '<div style="width:80px;height:80px;border-radius:50%;background-color:'+c.primary+';color:#ffffff;font-size:28px;font-weight:bold;text-align:center;line-height:80px;font-family:'+f.family+';">'+(d.fullName||"A").charAt(0).toUpperCase()+'</div>';
+
+      // IMPORTANT: Replace signcraft.com with your actual domain
+      const viral = premium ? "" : '<tr><td style="padding-top:12px;"><a href="https://signcraft.com?ref=sig" target="_blank" style="font-size:10px;color:#a0aec0;text-decoration:none;font-family:'+f.family+';">Create your professional signature \u2192 signcraft.com</a></td></tr>';
+
+      const contactRows = [
+        d.email ? '<tr><td style="padding:2px 0;"><a href="mailto:'+d.email+'" style="color:'+c.primary+';text-decoration:none;">\u2709 '+d.email+'</a></td></tr>' : "",
+        d.phone ? '<tr><td style="padding:2px 0;"><a href="tel:'+d.phone.replace(/\s/g,"")+'" style="color:'+c.primary+';text-decoration:none;">\u260F '+d.phone+'</a></td></tr>' : "",
+        d.website ? '<tr><td style="padding:2px 0;"><a href="https://'+d.website.replace(/^https?:\/\//,"")+'" style="color:'+c.primary+';text-decoration:none;">\u25C8 '+d.website+'</a></td></tr>' : "",
+        d.address ? '<tr><td style="padding:2px 0;color:#718096;">\u25C9 '+d.address+'</td></tr>' : "",
+      ].join("");
+
+      if (tmpl === "bold") {
+        return '<table cellpadding="0" cellspacing="0" border="0" style="font-family:'+f.family+';max-width:500px;"><tr><td style="background-color:'+c.primary+';padding:16px 20px;border-radius:8px 8px 0 0;"><table cellpadding="0" cellspacing="0" border="0"><tr><td style="vertical-align:middle;padding-right:16px;">'+photo+'</td><td style="vertical-align:middle;"><div style="font-size:20px;font-weight:bold;color:#ffffff;margin-bottom:2px;">'+(d.fullName||"")+'</div><div style="font-size:13px;color:'+c.accent+';font-weight:600;">'+(d.jobTitle||"")+'</div>'+(d.company?'<div style="font-size:12px;color:#cbd5e0;margin-top:2px;">'+d.company+'</div>':"")+'</td></tr></table></td></tr><tr><td style="padding:14px 20px;background:#f7fafc;border:1px solid #e2e8f0;border-top:3px solid '+c.accent+';border-radius:0 0 8px 8px;"><table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;color:#4a5568;">'+contactRows+'</table>'+(socialHTML?'<div style="margin-top:10px;">'+socialHTML+'</div>':'')+(viral?'<table cellpadding="0" cellspacing="0" border="0">'+viral+'</table>':'')+'</td></tr></table>';
+      }
+
+      if (tmpl === "elegant") {
+        const inlineContact = [
+          d.email ? '<td style="padding-right:16px;"><a href="mailto:'+d.email+'" style="color:'+c.primary+';text-decoration:none;">'+d.email+'</a></td>' : "",
+          d.phone ? '<td style="padding-right:16px;border-left:1px solid #e2e8f0;padding-left:16px;"><a href="tel:'+d.phone.replace(/\s/g,"")+'" style="color:'+c.primary+';text-decoration:none;">'+d.phone+'</a></td>' : "",
+          d.website ? '<td style="border-left:1px solid #e2e8f0;padding-left:16px;"><a href="https://'+d.website.replace(/^https?:\/\//,"")+'" style="color:'+c.primary+';text-decoration:none;">'+d.website+'</a></td>' : "",
+        ].join("");
+        return '<table cellpadding="0" cellspacing="0" border="0" style="font-family:'+f.family+';max-width:500px;"><tr><td style="padding-bottom:12px;border-bottom:2px solid '+c.accent+';"><table cellpadding="0" cellspacing="0" border="0"><tr><td style="vertical-align:top;padding-right:18px;">'+photo+'</td><td style="vertical-align:top;"><div style="font-size:18px;font-weight:bold;color:'+c.primary+';letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">'+(d.fullName||"")+'</div><div style="font-size:12px;color:'+c.accent+';letter-spacing:2px;text-transform:uppercase;font-weight:500;">'+(d.jobTitle||"")+'</div>'+(d.company?'<div style="font-size:12px;color:#718096;margin-top:4px;font-style:italic;">'+d.company+'</div>':'')+'</td></tr></table></td></tr><tr><td style="padding-top:12px;"><table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;color:#4a5568;"><tr>'+inlineContact+'</tr></table>'+(d.address?'<div style="font-size:11px;color:#a0aec0;margin-top:6px;">'+d.address+'</div>':'')+(socialHTML?'<div style="margin-top:10px;">'+socialHTML+'</div>':'')+'</td></tr>'+viral+'</table>';
+      }
+
+      if (tmpl === "creative") {
+        const rows = [
+          d.email ? '<div style="margin-bottom:3px;"><a href="mailto:'+d.email+'" style="color:#4a5568;text-decoration:none;">\u2192 '+d.email+'</a></div>' : "",
+          d.phone ? '<div style="margin-bottom:3px;"><a href="tel:'+d.phone.replace(/\s/g,"")+'" style="color:#4a5568;text-decoration:none;">\u2192 '+d.phone+'</a></div>' : "",
+          d.website ? '<div style="margin-bottom:3px;"><a href="https://'+d.website.replace(/^https?:\/\//,"")+'" style="color:#4a5568;text-decoration:none;">\u2192 '+d.website+'</a></div>' : "",
+          d.address ? '<div style="margin-bottom:3px;color:#a0aec0;">\u2192 '+d.address+'</div>' : "",
+        ].join("");
+        return '<table cellpadding="0" cellspacing="0" border="0" style="font-family:'+f.family+';max-width:500px;"><tr><td style="padding:4px 0;"><table cellpadding="0" cellspacing="0" border="0"><tr><td style="vertical-align:top;padding-right:4px;"><div style="width:6px;min-height:100px;background:linear-gradient(180deg,'+c.primary+','+c.accent+');border-radius:3px;"></div></td><td style="vertical-align:top;padding-left:14px;"><div style="font-size:22px;font-weight:800;color:'+c.primary+';line-height:1.1;">'+(d.fullName||"")+'</div><div style="font-size:13px;color:'+c.accent+';font-weight:600;margin-top:4px;">'+(d.jobTitle||"")+(d.company?" \u00B7 "+d.company:"")+'</div><div style="margin-top:10px;font-size:12px;color:#4a5568;">'+rows+'</div>'+(socialHTML?'<div style="margin-top:10px;">'+socialHTML+'</div>':'')+'</td></tr></table></td></tr>'+viral+'</table>';
+      }
+
+      // Modern (default)
+      return '<table cellpadding="0" cellspacing="0" border="0" style="font-family:'+f.family+';max-width:500px;"><tr><td style="padding-right:18px;vertical-align:top;border-right:3px solid '+c.accent+';">'+photo+'</td><td style="padding-left:18px;vertical-align:top;"><div style="font-size:18px;font-weight:bold;color:'+c.primary+';margin-bottom:2px;">'+(d.fullName||"")+'</div><div style="font-size:13px;color:'+c.accent+';font-weight:500;margin-bottom:8px;">'+(d.jobTitle||"")+(d.company?" | "+d.company:"")+'</div><table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;color:#4a5568;">'+contactRows+'</table>'+(socialHTML?'<div style="margin-top:8px;">'+socialHTML+'</div>':'')+'</td></tr>'+viral+'</table>';
+    }
+
+    function LandingPage({ onStart }) {
+      return (
+        <div style={{minHeight:"100vh",background:"#0a0e1a",color:"#e2e8f0",overflow:"hidden",position:"relative"}}>
+          <div style={{position:"absolute",inset:0,overflow:"hidden",pointerEvents:"none",background:"radial-gradient(ellipse at 20% 50%,rgba(99,102,241,0.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(198,148,26,0.06) 0%,transparent 50%)"}} />
+          <nav className="anim-in anim-d1" style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"20px 32px",position:"relative",zIndex:10}}>
+            <div style={{display:"flex",alignItems:"center",gap:10}}>
+              <div style={{width:36,height:36,borderRadius:10,background:"linear-gradient(135deg,#6366f1,#c6941a)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:18,color:"#fff"}}>S</div>
+              <span style={{fontWeight:700,fontSize:20,letterSpacing:-0.5}}>Sign<span style={{color:"#c6941a"}}>Craft</span></span>
+            </div>
+            <div style={{display:"flex",gap:24,alignItems:"center",fontSize:14,fontWeight:500}}>
+              <a href="#features" style={{color:"#94a3b8",textDecoration:"none",cursor:"pointer"}}>Features</a>
+              <a href="#pricing" style={{color:"#94a3b8",textDecoration:"none",cursor:"pointer"}}>Pricing</a>
+              <button onClick={onStart} style={{background:"linear-gradient(135deg,#6366f1,#4f46e5)",color:"#fff",border:"none",borderRadius:8,padding:"8px 20px",fontWeight:600,cursor:"pointer",fontSize:13}}>Get Started Free</button>
+            </div>
+          </nav>
+          <div className="anim-in anim-d2" style={{maxWidth:900,margin:"0 auto",padding:"80px 32px 40px",textAlign:"center",position:"relative",zIndex:10}}>
+            <div style={{display:"inline-block",background:"rgba(99,102,241,0.15)",border:"1px solid rgba(99,102,241,0.3)",borderRadius:99,padding:"6px 16px",fontSize:12,fontWeight:600,color:"#818cf8",marginBottom:28,letterSpacing:0.5}}>{"\u2726"} USED BY 50,000+ PROFESSIONALS</div>
+            <h1 className="hero-title" style={{fontSize:"clamp(36px,6vw,64px)",fontWeight:800,lineHeight:1.08,letterSpacing:-2,margin:"0 0 24px",background:"linear-gradient(135deg,#ffffff 30%,#c6941a 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>Your email signature<br/>should work for you.</h1>
+            <p style={{fontSize:18,color:"#94a3b8",maxWidth:520,margin:"0 auto 40px",lineHeight:1.6}}>Create a stunning, professional email signature in 60 seconds. Free forever. No design skills needed.</p>
+            <button onClick={onStart} style={{background:"linear-gradient(135deg,#c6941a,#d4a843)",color:"#0a0e1a",border:"none",borderRadius:12,padding:"16px 40px",fontWeight:700,fontSize:16,cursor:"pointer",letterSpacing:0.3,boxShadow:"0 0 40px rgba(198,148,26,0.3)"}}>Create My Signature {"\u2192"}</button>
+            <p style={{fontSize:12,color:"#475569",marginTop:12}}>Free {"\u2022"} No sign-up required {"\u2022"} Takes 60 seconds</p>
+          </div>
+          <div className="anim-in anim-d3 preview-cards" style={{maxWidth:800,margin:"40px auto 0",padding:"0 32px",display:"flex",gap:16,justifyContent:"center",flexWrap:"wrap"}}>
+            {[{n:"Sarah Chen",t:"VP of Engineering",c:"#6366f1"},{n:"Marcus Rivera",t:"Creative Director",c:"#c6941a"},{n:"Emma Larsson",t:"Growth Lead",c:"#10b981"}].map((p,i)=>(
+              <div key={i} style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:12,padding:20,flex:"1 1 200px",maxWidth:240,backdropFilter:"blur(10px)"}}>
+                <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:12}}>
+                  <div style={{width:40,height:40,borderRadius:"50%",background:p.c,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontSize:16,color:"#fff"}}>{p.n[0]}</div>
+                  <div><div style={{fontWeight:600,fontSize:14}}>{p.n}</div><div style={{fontSize:11,color:"#64748b"}}>{p.t}</div></div>
+                </div>
+                <div style={{height:2,background:p.c,borderRadius:1,opacity:0.6}} />
+                <div style={{marginTop:10,fontSize:11,color:"#64748b",lineHeight:1.6}}>
+                  <div>{"\u2709"} {p.n.toLowerCase().replace(" ",".")}@company.com</div>
+                  <div>{"\u260F"} +1 (555) 000-0000</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div id="features" className="anim-in anim-d4" style={{maxWidth:900,margin:"100px auto 0",padding:"0 32px"}}>
+            <h2 style={{textAlign:"center",fontSize:32,fontWeight:700,letterSpacing:-1,marginBottom:48}}>Everything you need. <span style={{color:"#c6941a"}}>Nothing you don't.</span></h2>
+            <div className="feature-grid" style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:20}}>
+              {[{i:"\u26A1",t:"60-Second Setup",d:"Fill in your details, pick a template, done."},{i:"\uD83C\uDFA8",t:"4 Pro Templates",d:"Modern, Bold, Elegant, and Creative styles."},{i:"\uD83D\uDCCB",t:"One-Click Copy",d:"Copy HTML and paste into any email client."},{i:"\uD83C\uDF0D",t:"Works Everywhere",d:"Gmail, Outlook, Apple Mail, Thunderbird."},{i:"\uD83D\uDCF1",t:"Mobile Responsive",d:"Signatures that look great on any device."},{i:"\uD83D\uDD12",t:"Privacy First",d:"Your data stays in your browser. Period."}].map((f,i)=>(
+                <div key={i} style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:12,padding:24}}>
+                  <div style={{fontSize:28,marginBottom:12}}>{f.i}</div>
+                  <div style={{fontWeight:600,fontSize:15,marginBottom:6}}>{f.t}</div>
+                  <div style={{fontSize:13,color:"#64748b",lineHeight:1.5}}>{f.d}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div id="pricing" className="anim-in anim-d5" style={{maxWidth:700,margin:"100px auto",padding:"0 32px"}}>
+            <h2 style={{textAlign:"center",fontSize:32,fontWeight:700,letterSpacing:-1,marginBottom:48}}>Simple, <span style={{color:"#c6941a"}}>transparent</span> pricing</h2>
+            <div className="pricing-grid" style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:20}}>
+              <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:16,padding:32}}>
+                <div style={{fontSize:13,fontWeight:600,color:"#64748b",textTransform:"uppercase",letterSpacing:1}}>Free</div>
+                <div style={{fontSize:40,fontWeight:800,margin:"8px 0"}}>{"\u20AC"}0</div>
+                <div style={{fontSize:13,color:"#64748b",marginBottom:24}}>Forever free</div>
+                {["All 4 templates","Unlimited signatures","One-click copy","Social media icons","Mobile responsive"].map((x,i)=><div key={i} style={{fontSize:13,padding:"6px 0",color:"#94a3b8"}}>{"\u2713"} {x}</div>)}
+                <div style={{fontSize:11,color:"#475569",marginTop:12,fontStyle:"italic"}}>Includes "Made with SignCraft" link</div>
+              </div>
+              <div style={{background:"linear-gradient(135deg,rgba(99,102,241,0.1),rgba(198,148,26,0.1))",border:"1px solid rgba(198,148,26,0.3)",borderRadius:16,padding:32,position:"relative"}}>
+                <div style={{position:"absolute",top:-10,right:20,background:"#c6941a",color:"#0a0e1a",borderRadius:6,padding:"4px 12px",fontSize:11,fontWeight:700}}>POPULAR</div>
+                <div style={{fontSize:13,fontWeight:600,color:"#c6941a",textTransform:"uppercase",letterSpacing:1}}>Premium</div>
+                <div style={{fontSize:40,fontWeight:800,margin:"8px 0"}}>{"\u20AC"}7<span style={{fontSize:20}}>.99</span></div>
+                <div style={{fontSize:13,color:"#64748b",marginBottom:24}}>per month</div>
+                {["Everything in Free","Remove SignCraft branding","Premium color schemes","Custom font uploads","Priority email support","Click analytics"].map((x,i)=><div key={i} style={{fontSize:13,padding:"6px 0",color:"#e2e8f0"}}>{"\u2713"} {x}</div>)}
+                <button style={{marginTop:20,width:"100%",background:"linear-gradient(135deg,#c6941a,#d4a843)",color:"#0a0e1a",border:"none",borderRadius:8,padding:"12px",fontWeight:700,fontSize:14,cursor:"pointer"}}>Upgrade to Premium</button>
+              </div>
+            </div>
+          </div>
+          <div style={{textAlign:"center",padding:"40px 32px 80px"}}>
+            <button onClick={onStart} style={{background:"linear-gradient(135deg,#c6941a,#d4a843)",color:"#0a0e1a",border:"none",borderRadius:12,padding:"16px 40px",fontWeight:700,fontSize:16,cursor:"pointer"}}>Create My Free Signature {"\u2192"}</button>
+          </div>
+          <footer style={{textAlign:"center",padding:"20px 32px 40px",fontSize:12,color:"#475569"}}>
+            {"\u00A9"} 2026 SignCraft. All rights reserved. {"\u2022"} <a href="#" style={{color:"#64748b"}}>Privacy</a> {"\u2022"} <a href="#" style={{color:"#64748b"}}>Terms</a>
+          </footer>
+        </div>
+      );
+    }
+
+    function Editor({ onBack }) {
+      const [data, setData] = useState(DEFAULT_DATA);
+      const [tmpl, setTmpl] = useState("modern");
+      const [cs, setCs] = useState("navy");
+      const [font, setFont] = useState("arial");
+      const [copied, setCopied] = useState(false);
+      const [tab, setTab] = useState("details");
+
+      const update = (k, v) => setData(p => ({...p, [k]: v}));
+      const updateSocial = (pid, v) => setData(p => ({...p, socials: {...p.socials, [pid]: v}}));
+
+      const handleCopy = () => {
+        const html = genSigHTML(data, tmpl, cs, font, false);
+        try {
+          const blob = new Blob([html], {type:"text/html"});
+          const plain = new Blob([html], {type:"text/plain"});
+          navigator.clipboard.write([new ClipboardItem({"text/html":blob,"text/plain":plain})]).then(() => {
+            setCopied(true); setTimeout(() => setCopied(false), 2500);
+          });
+        } catch(e) {
+          const ta = document.createElement("textarea"); ta.value = html;
+          document.body.appendChild(ta); ta.select(); document.execCommand("copy");
+          document.body.removeChild(ta);
+          setCopied(true); setTimeout(() => setCopied(false), 2500);
+        }
+      };
+
+      const sigHTML = genSigHTML(data, tmpl, cs, font, false);
+      const iS = {width:"100%",padding:"10px 12px",borderRadius:8,border:"1px solid #2d3748",background:"#0f1629",color:"#e2e8f0",fontSize:13,outline:"none",boxSizing:"border-box",fontFamily:"inherit"};
+      const lS = {fontSize:11,fontWeight:600,color:"#94a3b8",marginBottom:4,display:"block",textTransform:"uppercase",letterSpacing:0.5};
+
+      return (
+        <div style={{minHeight:"100vh",background:"#0a0e1a",color:"#e2e8f0"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 24px",borderBottom:"1px solid rgba(255,255,255,0.06)",flexWrap:"wrap",gap:12}}>
+            <div style={{display:"flex",alignItems:"center",gap:12}}>
+              <button onClick={onBack} style={{background:"none",border:"none",color:"#64748b",cursor:"pointer",fontSize:14,padding:"4px 8px"}}>{"\u2190"} Back</button>
+              <div style={{display:"flex",alignItems:"center",gap:8}}>
+                <div style={{width:28,height:28,borderRadius:8,background:"linear-gradient(135deg,#6366f1,#c6941a)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:14,color:"#fff"}}>S</div>
+                <span style={{fontWeight:700,fontSize:16}}>Sign<span style={{color:"#c6941a"}}>Craft</span></span>
+              </div>
+            </div>
+            <button onClick={handleCopy} style={{background:copied?"#10b981":"linear-gradient(135deg,#c6941a,#d4a843)",color:copied?"#fff":"#0a0e1a",border:"none",borderRadius:8,padding:"10px 24px",fontWeight:700,fontSize:13,cursor:"pointer",minWidth:160}}>
+              {copied ? "\u2713 Copied to Clipboard!" : "\uD83D\uDCCB Copy Signature HTML"}
+            </button>
+          </div>
+          <div className="editor-layout" style={{display:"flex",minHeight:"calc(100vh - 57px)"}}>
+            <div className="editor-sidebar" style={{width:380,minWidth:380,borderRight:"1px solid rgba(255,255,255,0.06)",overflowY:"auto"}}>
+              <div style={{display:"flex",borderBottom:"1px solid rgba(255,255,255,0.06)"}}>
+                {[{id:"details",l:"Details"},{id:"style",l:"Style"},{id:"social",l:"Social"}].map(t=>(
+                  <button key={t.id} onClick={()=>setTab(t.id)} style={{flex:1,padding:"14px 0",background:"none",border:"none",borderBottom:tab===t.id?"2px solid #c6941a":"2px solid transparent",color:tab===t.id?"#e2e8f0":"#64748b",fontSize:13,fontWeight:600,cursor:"pointer"}}>{t.l}</button>
+                ))}
+              </div>
+              <div style={{padding:20}}>
+                {tab==="details" && <div style={{display:"flex",flexDirection:"column",gap:14}}>
+                  {[["fullName","Full Name","John Smith"],["jobTitle","Job Title","Product Designer"],["company","Company","Acme Inc."],["email","Email","you@company.com"],["phone","Phone","+1 (555) 123-4567"],["website","Website","www.yoursite.com"],["address","Address (optional)","123 Main St, City"],["photoUrl","Photo URL (optional)","https://example.com/photo.jpg"]].map(([k,l,p])=>(
+                    <div key={k}><label style={lS}>{l}</label><input style={iS} value={data[k]} onChange={e=>update(k,e.target.value)} placeholder={p} /></div>
+                  ))}
+                </div>}
+                {tab==="style" && <div style={{display:"flex",flexDirection:"column",gap:20}}>
+                  <div>
+                    <label style={lS}>Template</label>
+                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginTop:8}}>
+                      {TEMPLATES.map(t=><button key={t.id} onClick={()=>setTmpl(t.id)} style={{background:tmpl===t.id?"rgba(99,102,241,0.15)":"rgba(255,255,255,0.03)",border:tmpl===t.id?"2px solid #6366f1":"1px solid rgba(255,255,255,0.08)",borderRadius:10,padding:14,cursor:"pointer",textAlign:"left",color:"#e2e8f0"}}><div style={{fontWeight:600,fontSize:13}}>{t.name}</div><div style={{fontSize:11,color:"#64748b",marginTop:2}}>{t.desc}</div></button>)}
+                    </div>
+                  </div>
+                  <div>
+                    <label style={lS}>Color Scheme</label>
+                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginTop:8}}>
+                      {COLORS.map(c2=><button key={c2.id} onClick={()=>setCs(c2.id)} style={{background:cs===c2.id?"rgba(255,255,255,0.08)":"transparent",border:cs===c2.id?"2px solid #6366f1":"1px solid rgba(255,255,255,0.08)",borderRadius:8,padding:10,cursor:"pointer",textAlign:"center"}}><div style={{display:"flex",justifyContent:"center",gap:4,marginBottom:6}}><div style={{width:16,height:16,borderRadius:4,background:c2.primary}} /><div style={{width:16,height:16,borderRadius:4,background:c2.accent}} /></div><div style={{fontSize:10,color:"#94a3b8"}}>{c2.label}</div></button>)}
+                    </div>
+                  </div>
+                  <div>
+                    <label style={lS}>Font</label>
+                    <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:8}}>
+                      {FONTS.map(fo=><button key={fo.id} onClick={()=>setFont(fo.id)} style={{background:font===fo.id?"rgba(99,102,241,0.15)":"rgba(255,255,255,0.03)",border:font===fo.id?"2px solid #6366f1":"1px solid rgba(255,255,255,0.08)",borderRadius:8,padding:"10px 14px",cursor:"pointer",textAlign:"left",fontFamily:fo.family,color:"#e2e8f0",fontSize:14}}>{fo.label}</button>)}
+                    </div>
+                  </div>
+                </div>}
+                {tab==="social" && <div style={{display:"flex",flexDirection:"column",gap:14}}>
+                  <p style={{fontSize:12,color:"#64748b",margin:"0 0 6px"}}>Add your social profiles. Enter username or full URL.</p>
+                  {SOCIALS.map(p=><div key={p.id}><label style={lS}><span style={{marginRight:6}}>{p.icon}</span>{p.label}</label><input style={iS} value={data.socials[p.id]||""} onChange={e=>updateSocial(p.id,e.target.value)} placeholder={p.prefix+"yourname"} /></div>)}
+                </div>}
+              </div>
+            </div>
+            <div className="preview-panel" style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:40,background:"rgba(255,255,255,0.01)"}}>
+              <div style={{fontSize:11,fontWeight:600,color:"#64748b",textTransform:"uppercase",letterSpacing:1,marginBottom:20}}>Live Preview</div>
+              <div style={{background:"#ffffff",borderRadius:16,padding:40,maxWidth:600,width:"100%",boxShadow:"0 20px 60px rgba(0,0,0,0.4)"}}>
+                <div style={{marginBottom:20,paddingBottom:16,borderBottom:"1px solid #e2e8f0"}}>
+                  <div style={{fontSize:11,color:"#a0aec0",marginBottom:4}}>From: {data.email||"you@company.com"}</div>
+                  <div style={{fontSize:11,color:"#a0aec0",marginBottom:8}}>To: client@example.com</div>
+                  <div style={{fontSize:14,color:"#2d3748",fontWeight:600}}>Re: Project Update</div>
+                </div>
+                <div style={{fontSize:13,color:"#4a5568",lineHeight:1.7,marginBottom:24}}>Hi there,<br/><br/>Just following up on our conversation. Looking forward to hearing from you!<br/><br/>Best regards,</div>
+                <div style={{borderTop:"1px solid #e2e8f0",paddingTop:16}} dangerouslySetInnerHTML={{__html:sigHTML}} />
+              </div>
+              <div style={{marginTop:32,display:"flex",gap:12}}>
+                <button onClick={handleCopy} style={{background:copied?"#10b981":"linear-gradient(135deg,#c6941a,#d4a843)",color:copied?"#fff":"#0a0e1a",border:"none",borderRadius:10,padding:"14px 32px",fontWeight:700,fontSize:14,cursor:"pointer",boxShadow:"0 4px 20px rgba(198,148,26,0.3)"}}>
+                  {copied ? "\u2713 Copied!" : "\uD83D\uDCCB Copy Signature"}
+                </button>
+              </div>
+              <div style={{marginTop:20,background:"rgba(99,102,241,0.1)",border:"1px solid rgba(99,102,241,0.2)",borderRadius:10,padding:"14px 20px",maxWidth:500}}>
+                <div style={{fontSize:12,fontWeight:600,color:"#818cf8",marginBottom:4}}>How to use your signature</div>
+                <div style={{fontSize:11,color:"#94a3b8",lineHeight:1.6}}>
+                  1. Click "Copy Signature" above<br/>
+                  2. Open your email client (Gmail, Outlook, etc.)<br/>
+                  3. Go to Settings {"\u2192"} Signature<br/>
+                  4. Paste your new signature<br/>
+                  5. That's it! Every email you send will look professional.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function App() {
+      const [page, setPage] = useState("landing");
+      if (page === "editor") return <Editor onBack={() => setPage("landing")} />;
+      return <LandingPage onStart={() => setPage("editor")} />;
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
