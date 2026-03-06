@@ -372,7 +372,7 @@ function LandingPage({ onGetStarted }) {
             {["Everything in Free", "Remove SignCraft branding", "Premium color schemes", "Custom font uploads", "Priority email support", "Click analytics"].map((item, i) => (
               <div key={i} style={{ fontSize: 13, padding: "6px 0", color: "#e2e8f0" }}>✓ {item}</div>
             ))}
-            <a href="https://buy.stripe.com/YOUR_LINK_HERE" target="_blank" rel="noopener noreferrer" style={{
+            <a href="https://buy.stripe.com/8x2dR19qT9jM4Zv2Es9ws00" target="_blank" rel="noopener noreferrer" style={{
               display: "block", textAlign: "center", marginTop: 20,
               background: "linear-gradient(135deg, #c6941a, #d4a843)", color: "#0a0e1a",
               border: "none", borderRadius: 10, padding: "12px 24px", fontWeight: 700,
