@@ -351,6 +351,12 @@ function LandingPage({ onGetStarted }) {
               <div key={i} style={{ fontSize: 13, padding: "6px 0", color: "#94a3b8" }}>✓ {item}</div>
             ))}
             <div style={{ fontSize: 11, color: "#475569", marginTop: 12, fontStyle: "italic" }}>Includes "Made with SignCraft" link</div>
+            <button onClick={onGetStarted} style={{
+              display: "block", width: "100%", textAlign: "center", marginTop: 20,
+              background: "rgba(255,255,255,0.06)", color: "#e2e8f0",
+              border: "1px solid rgba(255,255,255,0.15)", borderRadius: 10, padding: "12px 24px", fontWeight: 700,
+              fontSize: 14, cursor: "pointer",
+            }}>Get Started Free</button>
           </div>
           <div style={{
             background: "linear-gradient(135deg, rgba(99,102,241,0.1), rgba(198,148,26,0.1))",
@@ -366,6 +372,13 @@ function LandingPage({ onGetStarted }) {
             {["Everything in Free", "Remove SignCraft branding", "Premium color schemes", "Custom font uploads", "Priority email support", "Click analytics"].map((item, i) => (
               <div key={i} style={{ fontSize: 13, padding: "6px 0", color: "#e2e8f0" }}>✓ {item}</div>
             ))}
+            <a href="https://buy.stripe.com/YOUR_LINK_HERE" target="_blank" rel="noopener noreferrer" style={{
+              display: "block", textAlign: "center", marginTop: 20,
+              background: "linear-gradient(135deg, #c6941a, #d4a843)", color: "#0a0e1a",
+              border: "none", borderRadius: 10, padding: "12px 24px", fontWeight: 700,
+              fontSize: 14, textDecoration: "none", cursor: "pointer",
+              boxShadow: "0 4px 20px rgba(198,148,26,0.3)",
+            }}>Get Premium →</a>
           </div>
         </div>
       </div>
