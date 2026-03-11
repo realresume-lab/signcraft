@@ -378,7 +378,7 @@ function LandingPage({ onGetStarted }) {
               border: "none", borderRadius: 10, padding: "12px 24px", fontWeight: 700,
               fontSize: 14, textDecoration: "none", cursor: "pointer",
               boxShadow: "0 4px 20px rgba(198,148,26,0.3)",
-            }}>Get Premium →</a>
+            }}>Upgrade to Premium</a>
           </div>
         </div>
       </div>
